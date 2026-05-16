@@ -1278,7 +1278,31 @@ function saveSvSettingEdit(id){var amt=parseInt(document.getElementById("sv-amt-
 function removeSaving(id){for(var i=0;i<state.savings.length;i++){if(state.savings[i].id===id){state.savings.splice(i,1);break;}}delete state.dismissedSavings[id];persist();rebuildFixedTxs();renderSet();render();}
 function openSvPicker(){var existing={};for(var i=0;i<state.savings.length;i++)existing[state.savings[i].name]=true;var html='<div class="tpl-sec"><span>定期儲蓄</span><span class="ln"></span></div>';var any=false;for(var j=0;j<SAVINGS_TEMPLATES.length;j++){var it=SAVINGS_TEMPLATES[j];if(existing[it.name])continue;any=true;html+='<div class="tpl-row" onclick="addSvFromTpl(\''+it.key+'\')"><div class="ic">'+it.icon+'</div><div class="body"><div class="nm">'+it.name+'<div class="when">每月 '+it.day+' 號</div></div></div><div style="font-size:13px;color:var(--ink-soft);">$'+it.amt.toLocaleString()+'</div></div>';}if(!any)html+='<div style="text-align:center;padding:18px 14px;font-size:13px;color:var(--ink-soft);">範本都加完了</div>';closeSet();setTimeout(function(){document.getElementById("tpl-body").innerHTML=html;document.getElementById("tpl-sheet").querySelector("h2").textContent="加入儲蓄";document.getElementById("tpl-sheet").classList.add("show");document.getElementById("tpl-ov").classList.add("show");},150);}
 function addSvFromTpl(key){var it=null;for(var i=0;i<SAVINGS_TEMPLATES.length;i++){if(SAVINGS_TEMPLATES[i].key===key){it=SAVINGS_TEMPLATES[i];break;}}if(!it)return;state.savings.push({id:state.savingsNextId++,name:it.name,amt:it.amt,day:it.day,icon:it.icon});persist();rebuildFixedTxs();closeTplPicker();setTimeout(function(){openSet();setCollapsed.savings=false;renderSet();},200);render();}
-function clearMonth(){var manualCount=state.txs.filter(function(t){return t.type==="manual";}).length;if(manualCount===0){alert("本月還沒有手動記的帳，沒東西可清。");return;}var msg="確定要清空本月明細嗎？\n\n會刪除 "+manualCount+" 筆手動記錄（每月固定支出會保留）。\n\n此動作無法復原。";if(!confirm(msg))return;state.txs=state.txs.filter(function(t){return t.type==="fixed";});persist();render();renderSet();}
+function clearMonth(){
+  var manualCount=state.txs.filter(function(t){return t.type==="manual";}).length;
+  var fixedCount=state.txs.filter(function(t){return t.type==="fixed";}).length;
+  var savingsCount=state.txs.filter(function(t){return t.type==="savings";}).length;
+  var extraCount=(state.extraIncomes||[]).length;
+  var total=manualCount+fixedCount+savingsCount+extraCount;
+  if(total===0){alert("本月還沒有任何記錄，沒東西可清。");return;}
+  // 列出會清的東西
+  var lines=[];
+  if(manualCount>0)lines.push("· "+manualCount+" 筆手動記錄");
+  if(fixedCount>0)lines.push("· "+fixedCount+" 筆月費扣款");
+  if(savingsCount>0)lines.push("· "+savingsCount+" 筆儲蓄");
+  if(extraCount>0)lines.push("· "+extraCount+" 筆額外收入");
+  var msg="確定要清空本月所有記錄嗎？\n\n會清掉：\n"+lines.join("\n")+"\n\n月費與儲蓄會根據設定重新生成。\n此動作無法復原。";
+  if(!confirm(msg))return;
+  // 全部清空 + 重置 dismissed 狀態（讓月費/儲蓄能正確 rebuild）
+  state.txs=[];
+  state.extraIncomes=[];
+  state.dismissedFixed={};
+  state.dismissedSavings={};
+  rebuildFixedTxs();
+  persist();
+  render();
+  renderSet();
+}
 function openProFromSet(){closeSet();setTimeout(openPro,200);}
 
 // ===== 歷史月份 (v16.2) =====
