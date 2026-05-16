@@ -3,8 +3,26 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
-<title>不月光 v1.10.3</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23EBE6DD'/%3E%3Cclippath id='c'%3E%3Ccircle cx='50' cy='50' r='48'/%3E%3C/clippath%3E%3Cpath d='M0 60 L100 55 L100 100 L0 100 Z' fill='%235BC0EB' clip-path='url(%23c)'/%3E%3C/svg%3E"/>
+<title>不月光 v1.10.5</title>
+<meta name="description" content="無痛記帳 · 水球視覺化你的本月預算"/>
+<meta name="theme-color" content="#1A2240"/>
+<meta name="application-name" content="不月光"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="不月光"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="format-detection" content="telephone=no"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="icon" type="image/x-icon" href="icons/favicon.ico"/>
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"/>
+<link rel="apple-touch-icon" href="icons/icon-180.png"/>
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png"/>
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png"/>
+<meta property="og:title" content="不月光"/>
+<meta property="og:description" content="無痛記帳 · 水球視覺化你的本月預算"/>
+<meta property="og:image" content="icons/icon-512.png"/>
+<meta property="og:type" content="website"/>
 <style>
 :root{--bg:#F4F1EC;--bg-2:#EBE6DD;--ink:#2A2A2A;--ink-soft:#7A7670;--ink-fade:#B5AFA6;--line:rgba(0,0,0,.07);--danger:#C84A3A;}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
@@ -402,7 +420,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 <div class="ball-cta" style="display:flex;flex-direction:column;gap:10px;"><button onclick="gotoKpad()">＋ 再記一筆</button><button onclick="openHist()" style="background:transparent;color:var(--ink-soft);border:1.5px solid rgba(0,0,0,0.12);font-size:15px;">看本月明細</button></div>
 </div>
 <div class="page ball-page hide" id="pg-welcome">
-<div class="topbar"><div style="width:36px;"></div><div style="text-align:center;line-height:1.3;"><div style="font-size:14px;color:var(--ink);font-weight:500;letter-spacing:0.02em;">不月光</div><div style="font-size:10px;color:var(--ink-fade);letter-spacing:0.1em;margin-top:2px;">歡迎</div></div><div style="width:36px;"></div></div>
+<div class="topbar"><div style="width:36px;"></div><div style="text-align:center;line-height:1.3;display:flex;align-items:center;gap:8px;justify-content:center;"><img src="icons/icon-48.png" alt="" style="width:28px;height:28px;border-radius:6px;flex-shrink:0;"/><div><div style="font-size:14px;color:var(--ink);font-weight:500;letter-spacing:0.02em;">不月光</div><div style="font-size:10px;color:var(--ink-fade);letter-spacing:0.1em;margin-top:2px;">歡迎</div></div></div><div style="width:36px;"></div></div>
 <div class="hero">
 <div class="welc-callout" id="welc-callout" style="display:none;flex-direction:column;align-items:center;gap:4px;margin-bottom:-4px;color:var(--ink-soft);font-size:12px;position:relative;z-index:2;">
 <div style="display:flex;align-items:center;gap:6px;">
@@ -535,7 +553,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 <div class="sheet-ov" id="contact-ov" onclick="closeContact()"></div>
 <div class="sheet" id="contact-sheet"><div class="sheet-grab"></div><div class="sheet-hd"><button class="back" onclick="closeContact()">←</button><h2>聯絡我們</h2><button class="close" onclick="closeContact()">×</button></div><div class="sheet-body" id="contact-body"></div></div>
 <script>
-var APP_VERSION="1.10.3";
+var APP_VERSION="1.10.5";
 var MONTH_NAMES=["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"];
 var COPY={earlyMonth:["月初支出比較大，沒關係","固定費用剛繳完吧","先撐過月初這幾筆","等大筆過了水位會穩","房租、訂閱繳完了嗎"],calm:["步調很穩","節奏剛剛好","今天可以好好放鬆","這個月有餘裕","穩穩的"],healthy:["控制不錯","跟得上節奏","保持這個感覺","還在軌道上","節奏正常"],watch:["最近花得有點快","節奏稍微快了一些","這幾天的速度高了","可以放慢一下"],faster:["需要稍微踩個煞車","這週放慢一點會更好","節奏明顯快了","暫停一下大額消費"],alert:["這幾天放慢一點","讓自己喘口氣","暫時保守一點","等月底再規劃"],empty:["先讓自己喘口氣","下個月再開始新的節奏","停下來休息","本月先收手"],overspent:["這個月透支了","下個月重新開始就好","暫停一下，等月底重置","已經超出今天的份"],newMonth:["新的一個月開始","水位重新滿了","新節奏，慢慢來"]};
 var COLORS={calm:"#4FB3D9",healthy:"#5BC0EB",watch:"#F5C04A",faster:"#E89B5C",alert:"#E5675A",empty:"#D4A4A0",earlyMonth:"#7FB8D4",newMonth:"#5BC0EB",overspent:"#B86A5C"};
@@ -1232,17 +1250,6 @@ html+='<div class="set-sec">關於</div>';
 html+='<div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:6px;font-size:12px;color:var(--ink-soft);line-height:1.7;">不月光完全在你的裝置本機運作，記帳資料不會上傳到任何伺服器。匯出檔內含完整記帳記錄，請妥善保管。</div>';
 html+='<div class="row link" onclick="openPrivacy()"><span class="ico">🛡</span><div class="nm">隱私權政策<div class="sub">資料如何被使用</div></div><span class="arr">›</span></div>';
 html+='<div class="row link" onclick="openContact()"><span class="ico">✉</span><div class="nm">聯絡我們<div class="sub">回報問題、建議或刪除資料請求</div></div><span class="arr">›</span></div>';
-/* === PROTOTYPE DEBUG: 試用/買斷 狀態快速跳期, 上線前移除整段 === */
-html+='<div style="margin-top:24px;padding:12px;background:#FFF4E0;border:1px dashed #D89B3A;border-radius:10px;font-size:12px;">';
-html+='<div style="color:#8A6520;font-weight:500;margin-bottom:8px;">⚙ 測試用 · Pro 狀態跳期</div>';
-html+='<div style="display:flex;gap:6px;flex-wrap:wrap;">';
-html+='<button onclick="debugSetTrialDays(28)" style="flex:1;min-width:60px;padding:7px;font-size:11px;border:1px solid #D89B3A;background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;">剛開始<br/>試用 28 天</button>';
-html+='<button onclick="debugSetTrialDays(5)" style="flex:1;min-width:60px;padding:7px;font-size:11px;border:1px solid #D89B3A;background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;">試用<br/>剩 5 天</button>';
-html+='<button onclick="debugSetTrialDays(1)" style="flex:1;min-width:60px;padding:7px;font-size:11px;border:1px solid #D89B3A;background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;">試用<br/>剩 1 天</button>';
-html+='<button onclick="debugSetTrialDays(0)" style="flex:1;min-width:60px;padding:7px;font-size:11px;border:1px solid #D89B3A;background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;">試用<br/>已過期</button>';
-html+='<button onclick="debugSetTrialDays(&quot;owned&quot;)" style="flex:1;min-width:60px;padding:7px;font-size:11px;border:1px solid #D89B3A;background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;">已永久<br/>解鎖</button>';
-html+='</div></div>';
-/* === END PROTOTYPE DEBUG === */
 html+='<div style="text-align:center;padding:20px 0 4px;font-size:10px;color:var(--ink-fade);letter-spacing:0.05em;line-height:1.6;">不月光<br/>Tide · v'+APP_VERSION+'</div>';
 document.getElementById("set-body").innerHTML=html;
 if(fxEditingId){setTimeout(function(){var inp=document.getElementById("fx-amt-"+fxEditingId);if(inp){inp.focus();inp.select();}},80);}}
@@ -1666,12 +1673,18 @@ function getProStatus(){if(state.proOwned)return {key:"purchased",remainDays:0};
 function proCanView(){var s=getProStatus().key;return s==="purchased"||s==="trial"||s==="trial-ending";}
 function renderPro(){var data=aggregateByParent();var total=0;for(var i=0;i<data.length;i++)total+=data[i].total;var ps=getProStatus();if(proCanView()){var banner="";if(ps.key==="trial-ending"){banner='<div style="background:#F4F1EC;color:var(--ink-soft);padding:10px 14px;border-radius:10px;margin:4px 0 14px;display:flex;align-items:center;gap:10px;font-size:13px;"><span>試用還剩 '+ps.remainDays+' 天</span><button onclick="buyPro()" style="margin-left:auto;background:var(--ink);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;">永久解鎖</button></div>';}var html=banner+'<div class="pro-hd"><div class="tt">'+MONTH_NAMES[state.month-1]+'支出分布</div><div class="vv">$'+total.toLocaleString()+'</div></div>';if(data.length===0){html+='<div class="empty"><div class="e">○</div><div class="t">本月還沒有資料</div><div class="s">記幾筆之後再回來看</div></div>';}else{html+='<div class="donut-card">'+buildDonut(data,total||1,proExpandedIdx)+'<div class="legend">';for(var j=0;j<data.length;j++){var d=data[j];var pct=pctStr(d.total,total);var isExp=(proExpandedIdx===j);var expColor=getDonutColor(d,j);if(j>0 && data[j-1].section!==d.section){html+=legendDivider();}html+='<div class="lg-row" style="cursor:pointer;flex-direction:column;align-items:stretch;'+(isExp?'background:#F4F1EC;border-radius:10px;margin:2px -6px;padding:8px 6px;':'')+'" onclick="toggleProDrill('+j+')">';html+='<div style="display:flex;align-items:center;gap:10px;"><div class="lg-dot" style="background:'+expColor+';'+(isExp?'width:12px;height:12px;':'')+'flex-shrink:0;"></div><span style="font-size:18px;">'+d.e+'</span><div class="lg-nm">'+d.label+'</div><div class="lg-pct">'+pct+'</div><div class="lg-amt">$'+d.total.toLocaleString()+'</div><div style="font-size:10px;color:var(--ink-fade);">'+(isExp?'▲':'▼')+'</div></div>';if(isExp){html+='<div style="margin-top:8px;margin-left:28px;border-left:2px solid '+expColor+';padding-left:10px;">';if(d.svSubtype==="oneoff"){var sortedTxs=d.txs.slice().sort(function(a,b){return b.day-a.day;});for(var oi=0;oi<sortedTxs.length;oi++){var ox=sortedTxs[oi];var noteStr=ox.note?' · '+escHtml(ox.note):'';html+='<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--line);"><span style="font-size:11px;color:var(--ink-fade);min-width:36px;">'+state.month+'/'+ox.day+'</span><div style="flex:1;font-size:13px;color:var(--ink-soft);">單筆'+noteStr+'</div><div style="font-size:13px;font-weight:500;">$'+ox.amt.toLocaleString()+'</div></div>';}}else{var subMap={};for(var si=0;si<d.txs.length;si++){var tx=d.txs[si];var subKey=tx.type==="fixed"?tx.catLabel:(tx.subLabel||tx.catLabel);if(!subMap[subKey])subMap[subKey]={label:subKey,icon:tx.catIcon,total:0,count:0};subMap[subKey].total+=tx.amt;subMap[subKey].count++;}var subArr=[];for(var sk in subMap)subArr.push(subMap[sk]);subArr.sort(function(a,b){return b.total-a.total;});for(var si2=0;si2<subArr.length;si2++){var sub=subArr[si2];html+='<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--line);"><span style="font-size:15px;">'+sub.icon+'</span><div style="flex:1;font-size:13px;">'+sub.label+'</div>'+(sub.count>1?'<div style="font-size:11px;color:var(--ink-fade);">×'+sub.count+'</div>':'')+'<div style="font-size:13px;font-weight:500;">$'+sub.total.toLocaleString()+'</div></div>';}}html+='</div>';}html+='</div>';}html+='</div></div>';}document.getElementById("pro-body").innerHTML=html;}else{var html2='<div class="locked"><div class="preview"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="70" fill="none" stroke="#5BC0EB" stroke-width="22" stroke-dasharray="180 260" transform="rotate(-90 100 100)"/><circle cx="100" cy="100" r="70" fill="none" stroke="#F5C04A" stroke-width="22" stroke-dasharray="120 320" stroke-dashoffset="-180" transform="rotate(-90 100 100)"/><circle cx="100" cy="100" r="70" fill="none" stroke="#E89B5C" stroke-width="22" stroke-dasharray="80 360" stroke-dashoffset="-300" transform="rotate(-90 100 100)"/></svg><div class="mask">🔒</div></div><h3>月底回顧</h3><p>看看這個月的水位花去哪裡。<br/>分類佔比、金額一目瞭然。</p><div class="price">NT$149<span class="v" style="font-size:13px;color:var(--ink-soft);margin-left:6px;">· 永久解鎖</span></div><button class="buy" onclick="buyPro()">永久解鎖 NT$149</button></div>';document.getElementById("pro-body").innerHTML=html2;}}
 function buyPro(){state.proOwned=true;persist();renderPro();}
-/* === PROTOTYPE DEBUG: 直接跳試用/購買狀態, 上線前移除 === */
-function debugSetTrialDays(d){if(d==="owned"){state.proOwned=true;}else{state.proOwned=false;state.trialStartAt=Date.now()-(28-d)*86400000;}persist();renderSet();}
-
-
 
 buildOnbNumpad();buildNumpad();rebuildFixedTxs();render();tick();
+
+// PWA: 註冊 service worker（離線運作 + 加到主畫面）
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('sw.js').catch(function(err){
+      // 失敗不影響使用、靜默
+      console.warn('SW register failed:',err);
+    });
+  });
+}
 if(!state.onboarded){startOnb();}else if(!state.welcomed){document.getElementById("onb").classList.add("hide");showWelcome();}else{document.getElementById("onb").classList.add("hide");gotoKpad();}
 // 跨月偵測：state 還停在舊月份且有資料 → 跳跨月封存畫面
 if(_pendingCrossMonth){
