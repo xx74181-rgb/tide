@@ -324,7 +324,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 <p id="onb-step4-sub" style="font-size:15px;color:var(--ink-soft);line-height:1.8;text-align:center;max-width:260px;">接下來，設定這個月的水球容量。</p>
 </div>
 <div class="onb-step center" id="onb-step-5" style="display:none;">
-<h1 id="onb-budget-title">這個月能用多少錢？</h1>
+<h1 id="onb-budget-title">輸入你這個月的收入</h1>
 <p id="onb-budget-sub" style="margin-bottom:4px;">例如你的薪資、月入</p>
 <p id="onb-budget-breakdown" style="font-size:13px;color:var(--ink-soft);margin:2px 0 4px;display:none;line-height:1.6;"></p>
 <div class="onb-amount" id="onb-amt-disp"><span class="cur">$</span><span class="ph">0</span></div>
@@ -562,6 +562,7 @@ var DEFAULT_CATS=[
 {e:"🚇",l:"交通",subs:[{e:"🚇",l:"大眾運輸"},{e:"🚕",l:"計程車"},{e:"⛽",l:"加油"},{e:"🅿",l:"停車"}]},
 {e:"🛒",l:"購物",subs:[{e:"👕",l:"衣物"},{e:"📱",l:"3C"},{e:"💄",l:"美妝"},{e:"🛍",l:"網購"}]},
 {e:"🎮",l:"娛樂",subs:[{e:"🎬",l:"電影"},{e:"🎵",l:"訂閱"},{e:"🎯",l:"KTV/桌遊"},{e:"🎟",l:"票券"},{e:"🎮",l:"遊戲"},{e:"🍺",l:"酒類"}]},
+{e:"✈️",l:"旅遊",subs:[{e:"✈️",l:"機票"},{e:"🏨",l:"住宿"},{e:"🚄",l:"交通"},{e:"🍱",l:"餐飲"},{e:"🛍",l:"紀念品"}]},
 {e:"📦",l:"日用",subs:[{e:"🧴",l:"清潔用品"},{e:"🧻",l:"日用品"},{e:"🔌",l:"小家電"}]},
 {e:"💊",l:"健康",subs:[{e:"🏥",l:"看診"},{e:"💊",l:"藥品"},{e:"🏋",l:"運動"},{e:"🥤",l:"補給品"}]},
 {e:"📚",l:"學習",subs:[{e:"📚",l:"書籍"},{e:"💻",l:"線上課程"},{e:"📝",l:"文具"}]},
@@ -635,6 +636,7 @@ var _now=getRealDate();
 var _nowYear=_now.getFullYear(),_nowMonth=_now.getMonth()+1,_nowDay=_now.getDate();
 if(!state){state={onboarded:false,welcomed:false,budget:30000,cats:deepCopy(DEFAULT_CATS),fixed:[],txs:[],fixedNextId:1,proOwned:false,trialStartAt:Date.now(),month:_nowMonth,year:_nowYear,dismissedFixed:{}};}
 if(!state.noteHistory)state.noteHistory={};
+if(!state.cats||!Array.isArray(state.cats)||!state.cats.length)state.cats=deepCopy(DEFAULT_CATS);
 for(var _i=0;_i<state.cats.length;_i++){if(!state.cats[_i]||!state.cats[_i].subs)state.cats[_i]=deepCopy(DEFAULT_CATS[_i])||{e:"✨",l:"其他",subs:[{e:"✨",l:"雜費"}]};}if(!state.dismissedFixed)state.dismissedFixed={};
 if(state.welcomed===undefined)state.welcomed=true;
 /* migrate: 舊 state.pro / proExpireAt → proOwned, trialStartAt */
@@ -711,11 +713,14 @@ function effectiveBudget(){return state.budget+totalExtraIncome();}
 function getStateInfo(){var spent=totalSpent();var eb=effectiveBudget();var remain=eb-spent;var R=eb>0?remain/eb:0;var D=simDay/simDaysInMonth;var H=1-D;var dlt=R-H;if(simDay<=3 && spent < eb*0.03) return {key:"newMonth",R:R,remain:remain};if(simDay<=7 && spent>0 && R>=0) return {key:"earlyMonth",R:R,remain:remain};if(R<0) return {key:"overspent",R:R,remain:remain};if(R<=0.05) return {key:"empty",R:R,remain:remain};if(R<0.10) return {key:"alert",R:R,remain:remain};if(dlt>=0.10) return {key:"calm",R:R,remain:remain};if(dlt>=-0.05) return {key:"healthy",R:R,remain:remain};if(dlt>=-0.15) return {key:"watch",R:R,remain:remain};if(dlt>=-0.25) return {key:"faster",R:R,remain:remain};return {key:"alert",R:R,remain:remain};}
 function pickCopy(st){var pool=COPY[st.key];if(!pool||!pool.length)return "";var seed=simDay+st.key.length;return pool[seed%pool.length];}
 var waveT=0, currentLevel=1.0, targetLevel=1.0, currentColor="#5BC0EB", targetColor="#5BC0EB", currentFixedRatio=0, currentSavingsRatio=0;
+// 波浪激動度：0=平靜（amp 1）、1=激動（amp 14）；每記一筆/收入/編輯/刪除/撤銷會跳到 1、每幀乘 0.993 衰減
+var excitement=0;
+function splash(){excitement=1;}
 function lerpColor(a,b,t){var ah=parseInt(a.slice(1),16),bh=parseInt(b.slice(1),16);var ar=(ah>>16)&255,ag=(ah>>8)&255,ab=ah&255;var br=(bh>>16)&255,bg=(bh>>8)&255,bb=bh&255;var r=Math.round(ar+(br-ar)*t),g=Math.round(ag+(bg-ag)*t),b2=Math.round(ab+(bb-ab)*t);return "#"+((1<<24)+(r<<16)+(g<<8)+b2).toString(16).slice(1);}
 function buildWavePath(level,phase,amp){var baseY=240*(1-level);var d="M0,"+(baseY+Math.sin(phase)*amp);for(var x=0;x<=240;x+=6){var y=baseY+Math.sin((x/40)+phase)*amp;d+=" L"+x+","+y;}d+=" L240,240 L0,240 Z";return d;}
 function ratioToCapHeight(ratio,r){ratio=Math.max(0,Math.min(1,ratio));if(ratio===0)return 0;if(ratio===1)return 2*r;var target=2*Math.PI*ratio;var lo=0,hi=2*Math.PI;for(var i=0;i<40;i++){var mid=(lo+hi)/2;if(mid-Math.sin(mid)<target)lo=mid;else hi=mid;}return r*(1-Math.cos(lo/2));}
 var welcomeLevel=1.0;
-function tick(){waveT+=0.045;currentLevel+=(targetLevel-currentLevel)*0.030;currentColor=lerpColor(currentColor,targetColor,0.05);var p1=document.getElementById("wave-path");var p2=document.getElementById("wave-path-2");if(p1){p1.setAttribute("d",buildWavePath(currentLevel,waveT,8));p1.setAttribute("fill",currentColor);}if(p2){p2.setAttribute("d",buildWavePath(currentLevel-0.015,waveT*0.7+1.5,10));p2.setAttribute("fill",currentColor);}
+function tick(){waveT+=0.045;currentLevel+=(targetLevel-currentLevel)*0.030;currentColor=lerpColor(currentColor,targetColor,0.05);excitement*=0.993;if(excitement<0.001)excitement=0;var amp=1+13*excitement;var p1=document.getElementById("wave-path");var p2=document.getElementById("wave-path-2");if(p1){p1.setAttribute("d",buildWavePath(currentLevel,waveT,amp));p1.setAttribute("fill",currentColor);}if(p2){p2.setAttribute("d",buildWavePath(currentLevel-0.015,waveT*0.7+1.5,amp*1.25));p2.setAttribute("fill",currentColor);}
 var fl=document.getElementById("fixed-layer");if(fl){var fh=currentFixedRatio>0?ratioToCapHeight(currentFixedRatio,115)+5:0;fl.setAttribute("y","0");fl.setAttribute("height",String(fh));var fe=document.getElementById("fixed-edge");if(fe){fe.setAttribute("y1",String(fh));fe.setAttribute("y2",String(fh));fe.setAttribute("opacity",fh>8?"1":"0");}}
 var sl=document.getElementById("savings-layer");if(sl){var sh=currentSavingsRatio>0?ratioToCapHeight(currentSavingsRatio,115)+5:0;sl.setAttribute("y",String(240-sh));sl.setAttribute("height",String(sh));var se=document.getElementById("savings-edge");if(se){se.setAttribute("y1",String(240-sh));se.setAttribute("y2",String(240-sh));se.setAttribute("opacity",sh>8?"1":"0");}}
 var w1=document.getElementById("w-wave-1");var w2=document.getElementById("w-wave-2");if(w1){w1.setAttribute("d",buildWavePath(welcomeLevel,waveT,8));}if(w2){w2.setAttribute("d",buildWavePath(welcomeLevel-0.015,waveT*0.7+1.5,10));}var xm=document.getElementById("xm-wave");if(xm){xm.setAttribute("d",buildWavePath(xmLevel,waveT,8));}requestAnimationFrame(tick);}
@@ -786,7 +791,7 @@ function legendDivider(){return '<div style="height:1px;background:rgba(0,0,0,0.
 function openNoteForm(label){pendingNoteKey=label;document.getElementById("note-title").textContent=label;document.getElementById("note-input").value="";var hist=(state.noteHistory&&state.noteHistory[label])||[];var hDiv=document.getElementById("note-history");if(hist.length){hDiv.innerHTML=hist.map(function(n){var disp=n.length>12?n.slice(0,12)+"…":n;return'<button class="note-chip" data-note="'+escHtml(n)+'" onclick="selectNoteChip(this)">'+escHtml(disp)+'</button>';}).join("");hDiv.style.display="flex";}else{hDiv.innerHTML="";hDiv.style.display="none";}document.getElementById("note-ov").classList.add("show");document.getElementById("note-form").classList.add("show");setTimeout(function(){document.getElementById("note-input").focus();},120);}
 function selectNoteChip(el){document.querySelectorAll(".note-chip").forEach(function(c){c.classList.remove("sel");});el.classList.add("sel");document.getElementById("note-input").value=el.getAttribute("data-note")||"";}
 function discardNote(){document.getElementById("note-ov").classList.remove("show");document.getElementById("note-form").classList.remove("show");pendingTx=null;pendingNoteKey="";pendingAmt=0;pendingParentIdx=-1;inputAmt="";gotoKpad();}
-function commitNote(withNote){var note=withNote?document.getElementById("note-input").value.trim():"";if(note&&pendingNoteKey){if(!state.noteHistory)state.noteHistory={};var hist=state.noteHistory[pendingNoteKey]||[];if(hist.indexOf(note)===-1){hist.unshift(note);if(hist.length>10)hist.pop();}state.noteHistory[pendingNoteKey]=hist;}if(pendingTx){if(note)pendingTx.note=note;state.txs.push(pendingTx);lastTx=pendingTx;lastIncome=null;persist();var lbl=pendingTx.catLabel+(note?" · "+note:"");showUndo("已扣 $"+pendingTx.amt.toLocaleString()+" · "+lbl);}document.getElementById("note-ov").classList.remove("show");document.getElementById("note-form").classList.remove("show");pendingTx=null;pendingNoteKey="";pendingAmt=0;pendingParentIdx=-1;inputAmt="";gotoBall();}
+function commitNote(withNote){var note=withNote?document.getElementById("note-input").value.trim():"";if(note&&pendingNoteKey){if(!state.noteHistory)state.noteHistory={};var hist=state.noteHistory[pendingNoteKey]||[];if(hist.indexOf(note)===-1){hist.unshift(note);if(hist.length>10)hist.pop();}state.noteHistory[pendingNoteKey]=hist;}if(pendingTx){if(note)pendingTx.note=note;state.txs.push(pendingTx);lastTx=pendingTx;lastIncome=null;persist();splash();var lbl=pendingTx.catLabel+(note?" · "+note:"");showUndo("已扣 $"+pendingTx.amt.toLocaleString()+" · "+lbl);}document.getElementById("note-ov").classList.remove("show");document.getElementById("note-form").classList.remove("show");pendingTx=null;pendingNoteKey="";pendingAmt=0;pendingParentIdx=-1;inputAmt="";gotoBall();}
 
 function openIncomeForm(){
   document.getElementById("inc-amt").value=inputAmt?(parseInt(inputAmt)||""):"";
@@ -817,6 +822,7 @@ function saveIncome(){
   lastIncome=item;
   lastTx=null;
   persist();
+  splash();
   inputAmt="";
   closeIncomeForm();
   var noteStr=note?" · "+note:"";
@@ -984,13 +990,13 @@ function doUndo(){
         if(state.extraIncomes[i].id===lastIncome.id){state.extraIncomes.splice(i,1);break;}
       }
     }
-    lastIncome=null;document.getElementById("undo-bar").classList.remove("show");clearTimeout(undoTimer);persist();render();return;
+    lastIncome=null;document.getElementById("undo-bar").classList.remove("show");clearTimeout(undoTimer);persist();splash();render();return;
   }
   if(!lastTx)return;
   var idx=-1;for(var i=0;i<state.txs.length;i++){if(state.txs[i].id===lastTx.id){idx=i;break;}}if(idx>=0)state.txs.splice(idx,1);
   if(lastTx.type==="fixed"&&lastTx.fixedId){state.dismissedFixed[lastTx.fixedId]=true;}
   if(lastTx.type==="savings"&&lastTx.savingsId){state.dismissedSavings[lastTx.savingsId]=true;}
-  lastTx=null;document.getElementById("undo-bar").classList.remove("show");clearTimeout(undoTimer);persist();render();
+  lastTx=null;document.getElementById("undo-bar").classList.remove("show");clearTimeout(undoTimer);persist();splash();render();
 }
 var onbStep=1, onbAmtInput="", onbSelectedTpl={}, onbEditingKey=null;
 var onbCustomItems=[]; var onbCustomNextId=1; var onbAddingInGroup=null;
@@ -1078,14 +1084,14 @@ function gotoOnbStep(s){
   if(s===3){buildSvWrap();}
   if(s===4){var fxTotal=0;for(var i=0;i<state.fixed.length;i++)fxTotal+=state.fixed[i].amt;var svTotal=0;for(var si=0;si<state.savings.length;si++)svTotal+=state.savings[si].amt;var t4=document.getElementById("onb-step4-title");var s4=document.getElementById("onb-step4-sub");var parts=[];if(fxTotal>0)parts.push('月費 <span style="color:#5BC0EB;">$'+fxTotal.toLocaleString()+'</span>');if(svTotal>0)parts.push('儲蓄 <span style="color:#D4A53A;">$'+svTotal.toLocaleString()+'</span>');if(parts.length){t4.innerHTML="每個月 "+parts.join(' · ')+"<br/>已經幫你記好了。";s4.textContent="接下來，設定這個月的水球容量。";}else{t4.textContent="固定支出和儲蓄都跳過了，沒關係。";s4.textContent="接下來，設定這個月的水球容量。";}}
   if(s===5){var fxTotal2=0;for(var i2=0;i2<state.fixed.length;i2++)fxTotal2+=state.fixed[i2].amt;var svTotal2=0;for(var si2=0;si2<state.savings.length;si2++)svTotal2+=state.savings[si2].amt;var title=document.getElementById("onb-budget-title");var sub=document.getElementById("onb-budget-sub");var hint=document.getElementById("onb-budget-hint");var bk=document.getElementById("onb-budget-breakdown");
-    title.textContent="這個月能用多少錢？";
+    title.textContent="輸入你這個月的收入";
     if(fxTotal2>0||svTotal2>0){
       sub.textContent="例如你的薪資、月入";
-      hint.textContent="會自動算出能主動花多少";
+      hint.textContent="會自動算出你能主動花多少";
     }else{
-      sub.textContent="一個你能放心花的數字";
+      sub.textContent="例如你的薪資、月入";
       if(bk)bk.style.display="none";
-      hint.textContent="輸入後，水位從這裡開始";
+      hint.textContent="會自動算出你能主動花多少";
     }
     renderOnbAmt();
   }
@@ -1540,7 +1546,7 @@ html+='</td>';
 html+='</tr>';}
 html+='</tbody></table>';
 document.getElementById("hist-body").innerHTML=html;}
-function removeTx(id){for(var i=0;i<state.txs.length;i++){if(state.txs[i].id===id){var t=state.txs[i];if(t.type==="fixed"&&t.fixedId){state.dismissedFixed[t.fixedId]=true;}if(t.type==="savings"&&t.savingsId){state.dismissedSavings[t.savingsId]=true;}state.txs.splice(i,1);break;}}persist();renderHist();render();}
+function removeTx(id){for(var i=0;i<state.txs.length;i++){if(state.txs[i].id===id){var t=state.txs[i];if(t.type==="fixed"&&t.fixedId){state.dismissedFixed[t.fixedId]=true;}if(t.type==="savings"&&t.savingsId){state.dismissedSavings[t.savingsId]=true;}state.txs.splice(i,1);break;}}persist();splash();renderHist();render();}
 
 /* === 編輯已記 tx === */
 var editingTxId=null;
@@ -1634,7 +1640,7 @@ function saveEditTx(){
     if(hist.indexOf(newNote)===-1){hist.unshift(newNote);if(hist.length>10)hist.pop();}
     state.noteHistory[t.catLabel]=hist;
   }
-  persist();closeEditTx();renderHist();render();
+  persist();closeEditTx();renderHist();splash();render();
 }
 function openPro(){renderPro();document.getElementById("pro-sheet").classList.add("show");document.getElementById("pro-ov").classList.add("show");}
 function closePro(){document.getElementById("pro-sheet").classList.remove("show");document.getElementById("pro-ov").classList.remove("show");}
