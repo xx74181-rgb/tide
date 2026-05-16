@@ -1237,7 +1237,8 @@ var svTotal=0;for(var svi=0;svi<state.savings.length;svi++)svTotal+=state.saving
 html+='<div onclick="toggleSetSection(\'savings\')" style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:#fff;border-radius:12px;padding:13px 14px;margin-bottom:6px;"><span style="font-size:15px;color:var(--ink);">每月儲蓄</span><span style="font-size:13px;color:var(--ink-soft);">'+(svCollapsed?(state.savings.length===0?'尚無 ▼':(state.savings.length+' 筆 $'+svTotal.toLocaleString()+' ▼')):'▲')+'</span></div>';
 if(!svCollapsed){if(state.savings.length===0){html+='<div style="text-align:center;padding:18px 14px;font-size:13px;color:var(--ink-soft);background:#fff;border-radius:12px;margin-bottom:6px;"><div style="font-size:24px;opacity:0.4;margin-bottom:6px;">○</div>還沒有儲蓄項目<div style="font-size:11px;color:var(--ink-fade);margin-top:4px;">下方可新增</div></div>';}for(var svj=0;svj<state.savings.length;svj++){var sv=state.savings[svj];if(svEditingId===sv.id){html+='<div class="fx-row"><div class="fx-ico">'+sv.icon+'</div><div class="fx-body"><div class="fx-name">'+sv.name+'</div><div class="fx-edit"><span class="lab">$</span><input type="number" id="sv-amt-'+sv.id+'" value="'+sv.amt+'"/><span class="lab">每月</span><select id="sv-day-'+sv.id+'">'+dayOpts(sv.day)+'</select><button class="ok" onclick="saveSvSettingEdit('+sv.id+')">儲存</button><button class="ko" onclick="cancelSvSettingEdit()">取消</button></div></div></div>';}else{html+='<div class="fx-row"><div class="fx-ico">'+sv.icon+'</div><div class="fx-body"><div class="fx-name">'+sv.name+'</div><div class="fx-meta"><button class="fx-meta-chip" onclick="startSvSettingEdit('+sv.id+')">$'+sv.amt.toLocaleString()+' <span class="pen">✎</span></button><button class="fx-meta-chip" onclick="startSvSettingEdit('+sv.id+')">每月 '+sv.day+' 號 <span class="pen">✎</span></button></div></div><button class="fx-rm" onclick="removeSaving('+sv.id+')">×</button></div>';}}html+='<div class="row add" onclick="openSvPicker()">＋ 從範本新增</div>';}
 html+='<div class="set-sec">月底回顧</div>';
-var _ps=getProStatus();var _proSub="永久解鎖 NT$149";if(_ps.key==="purchased")_proSub="已解鎖";else if(_ps.key==="trial")_proSub="試用期還剩 "+_ps.remainDays+" 天";else if(_ps.key==="trial-ending")_proSub="試用還剩 "+_ps.remainDays+" 天";
+// v1.11 公測版：付費功能還沒上、子標寫公測說明（保留原 status 邏輯為註解、未來金流接好還原）
+var _proSub="公測期間 · 全功能開放";
 html+='<div class="row link" onclick="openProFromSet()"><span class="ico">○</span><div class="nm">查看圓餅圖<div class="sub">'+_proSub+'</div></div><span class="arr">›</span></div>';
 var _histCount=(state.history||[]).length;
 html+='<div class="row link" onclick="openHistListFromSet()"><span class="ico">📅</span><div class="nm">過去月份<div class="sub">'+(_histCount===0?'尚無封存月份':_histCount+' 個月可回顧')+'</div></div><span class="arr">›</span></div>';
@@ -1262,6 +1263,11 @@ html+='<div class="set-sec">關於</div>';
 html+='<div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:6px;font-size:12px;color:var(--ink-soft);line-height:1.7;">不月光完全在你的裝置本機運作，記帳資料不會上傳到任何伺服器。匯出檔內含完整記帳記錄，請妥善保管。</div>';
 html+='<div class="row link" onclick="openPrivacy()"><span class="ico">🛡</span><div class="nm">隱私權政策<div class="sub">資料如何被使用</div></div><span class="arr">›</span></div>';
 html+='<div class="row link" onclick="openContact()"><span class="ico">✉</span><div class="nm">聯絡我們<div class="sub">回報問題、建議或刪除資料請求</div></div><span class="arr">›</span></div>';
+// v1.11 公測公告
+html+='<div style="background:#F4F1EC;border:0.5px solid var(--line);border-radius:12px;padding:14px 16px;margin:18px 0 6px;font-size:12px;color:var(--ink-soft);line-height:1.8;">'
+  +'<div style="font-size:13px;color:var(--ink);font-weight:500;margin-bottom:6px;">📢 關於這個版本</div>'
+  +'目前為 v1.11 公測版本、所有功能免費開放使用。<br/>未來 v1.12 將推出 Pro 付費方案。<br/>謝謝你是最早的試用者。'
+  +'</div>';
 html+='<div style="text-align:center;padding:20px 0 4px;font-size:10px;color:var(--ink-fade);letter-spacing:0.05em;line-height:1.6;">不月光<br/>Tide · v'+APP_VERSION+'</div>';
 document.getElementById("set-body").innerHTML=html;
 if(fxEditingId){setTimeout(function(){var inp=document.getElementById("fx-amt-"+fxEditingId);if(inp){inp.focus();inp.select();}},80);}}
@@ -1310,7 +1316,7 @@ function openHistListFromSet(){closeSet();setTimeout(openHistList,200);}
 function openHistList(){renderHistList();document.getElementById("histlist-sheet").classList.add("show");document.getElementById("histlist-ov").classList.add("show");}
 function closeHistList(){document.getElementById("histlist-sheet").classList.remove("show");document.getElementById("histlist-ov").classList.remove("show");}
 function renderHistList(){
-  // 過去月份整個鎖在 list 層：試用過期、未付費者看鎖屏
+  // 過去月份整個鎖在 list 層（v1.11 公測版 proCanView 永遠 true、這段不會被觸發）
   if(!proCanView()){
     var lockHtml='<div class="locked">'
       +'<div class="preview"><svg viewBox="0 0 200 200">'
@@ -1320,10 +1326,8 @@ function renderHistList(){
       +'<rect x="40" y="132" width="95" height="18" rx="5" fill="#E5DFD3" opacity="0.7"/>'
       +'<rect x="40" y="160" width="110" height="22" rx="6" fill="#EBE6DD"/>'
       +'</svg><div class="mask">🔒</div></div>'
-      +'<h3>過去月份回顧</h3>'
-      +'<p>翻翻過去幾個月怎麼花<br/>圓餅、明細都看得到</p>'
-      +'<div class="price">NT$149<span class="v" style="font-size:13px;color:var(--ink-soft);margin-left:6px;">· 永久解鎖</span></div>'
-      +'<button class="buy" onclick="buyPro()">永久解鎖 NT$149</button>'
+      +'<h3>這個功能即將推出</h3>'
+      +'<p>下個版本將開放 Pro 付費方案<br/>能看過去幾個月的圓餅與明細</p>'
       +'</div>';
     document.getElementById("histlist-body").innerHTML=lockHtml;
     return;
@@ -1732,35 +1736,31 @@ function toggleProDrill(idx){
 }
 function closeProPaywall(){proShowingPaywall=false;renderPro();}
 function getProStatus(){if(state.proOwned)return {key:"purchased",remainDays:0};var elapsedMs=Date.now()-(state.trialStartAt||Date.now());var remainDays=Math.ceil((28*86400000-elapsedMs)/86400000);if(remainDays<=0)return {key:"expired",remainDays:0};if(remainDays<=5)return {key:"trial-ending",remainDays:remainDays};return {key:"trial",remainDays:remainDays};}
-function proCanView(){var s=getProStatus().key;return s==="purchased"||s==="trial"||s==="trial-ending";}
+function proCanView(){
+  // v1.11 公測版：所有人解鎖、未來 v1.12 重啟正式付費邏輯
+  return true;
+  /* 原邏輯保留、之後接金流再開啟：
+  var s=getProStatus().key;return s==="purchased"||s==="trial"||s==="trial-ending";
+  */
+}
 function renderProTrialPill(){
   var pill=document.getElementById("pro-trial-pill");
   if(!pill)return;
   var ps=getProStatus();
   if(ps.key==="purchased"){pill.style.display="none";return;}
   pill.style.display="inline-block";
+  pill.onclick=null;
+  pill.style.cursor="default";
   var d=ps.remainDays;
-  if(ps.key==="trial"){
-    // 一般試用期：灰底淡字、不點
+  if(ps.key==="trial"||ps.key==="trial-ending"){
     pill.textContent="試用剩 "+d+" 天";
     pill.style.background="rgba(0,0,0,0.04)";
     pill.style.color="var(--ink-soft)";
-    pill.onclick=null;
-    pill.style.cursor="default";
-  }else if(ps.key==="trial-ending"){
-    // 倒數最後 5 天：琥珀色警示、可點解鎖
-    pill.textContent="試用剩 "+d+" 天 · 解鎖";
-    pill.style.background="#F4E5C5";
-    pill.style.color="#7A5500";
-    pill.onclick=function(){proShowingPaywall=true;renderPro();};
-    pill.style.cursor="pointer";
   }else{
-    // expired：紅字、可點解鎖
-    pill.textContent="試用已結束 · 解鎖";
+    // expired：紅字、僅資訊
+    pill.textContent="試用已結束";
     pill.style.background="#F9DCDC";
     pill.style.color="#9A2828";
-    pill.onclick=function(){proShowingPaywall=true;renderPro();};
-    pill.style.cursor="pointer";
   }
 }
 function renderPro(){
@@ -1770,7 +1770,7 @@ function renderPro(){
   var ps=getProStatus();
   var canView=proCanView();
 
-  // 免費使用者點 🔒 → 切到 paywall 鎖屏
+  // 免費使用者點 🔒 → 切到 paywall 鎖屏（v1.11 公測版不會被觸發、但保留結構以便未來金流接回）
   if(!canView && proShowingPaywall){
     var lockHtml='<div class="locked">'
       +'<div class="preview"><svg viewBox="0 0 200 200">'
@@ -1778,10 +1778,8 @@ function renderPro(){
       +'<circle cx="100" cy="100" r="70" fill="none" stroke="#F5C04A" stroke-width="22" stroke-dasharray="120 320" stroke-dashoffset="-180" transform="rotate(-90 100 100)"/>'
       +'<circle cx="100" cy="100" r="70" fill="none" stroke="#E89B5C" stroke-width="22" stroke-dasharray="80 360" stroke-dashoffset="-300" transform="rotate(-90 100 100)"/>'
       +'</svg><div class="mask">🔒</div></div>'
-      +'<h3>解鎖看每一筆明細</h3>'
-      +'<p>點開任何分類、看到底花在哪<br/>每一筆金額、細項、日期都看得到</p>'
-      +'<div class="price">NT$149<span class="v" style="font-size:13px;color:var(--ink-soft);margin-left:6px;">· 永久解鎖</span></div>'
-      +'<button class="buy" onclick="buyPro()">永久解鎖 NT$149</button>'
+      +'<h3>這個功能即將推出</h3>'
+      +'<p>下個版本將開放 Pro 付費方案<br/>能點開每個分類看細項</p>'
       +'<button onclick="closeProPaywall()" style="display:block;margin:14px auto 0;background:transparent;color:var(--ink-soft);border:none;font-size:13px;cursor:pointer;font-family:inherit;text-decoration:underline;">← 返回看圓餅</button>'
       +'</div>';
     document.getElementById("pro-body").innerHTML=lockHtml;
