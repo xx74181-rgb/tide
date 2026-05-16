@@ -537,7 +537,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 <div class="sheet-ov" id="hist-ov" onclick="closeHist()"></div>
 <div class="sheet" id="hist-sheet"><div class="sheet-grab"></div><div class="sheet-hd"><h2>本月明細</h2><button class="close" onclick="closeHist()">×</button></div><div class="sheet-body" id="hist-body"></div></div>
 <div class="sheet-ov" id="pro-ov" onclick="closePro()"></div>
-<div class="sheet" id="pro-sheet"><div class="sheet-grab"></div><div class="sheet-hd"><h2>月底回顧</h2><button class="close" onclick="closePro()">×</button></div><div class="sheet-body" id="pro-body"></div></div>
+<div class="sheet" id="pro-sheet"><div class="sheet-grab"></div><div class="sheet-hd"><h2>月底回顧</h2><span id="pro-trial-pill" style="margin-left:auto;display:none;font-size:12px;padding:5px 10px;border-radius:12px;cursor:default;font-family:inherit;border:none;"></span><button class="close" onclick="closePro()" style="margin-left:auto;">×</button></div><div class="sheet-body" id="pro-body"></div></div>
 <div class="sheet-ov" id="se-ov" onclick="closeSubEdit()"></div>
 <div class="sheet" id="se-sheet"><div class="sheet-grab"></div><div class="sheet-hd"><button class="back" onclick="closeSubEdit()">←</button><h2 id="se-title">細項</h2><button class="close" onclick="closeSubEdit()">×</button></div><div class="sheet-body" id="se-body"></div></div>
 <div class="sheet-ov" id="tpl-ov" onclick="closeTplPicker()"></div>
@@ -1709,7 +1709,38 @@ function toggleProDrill(idx){
 function closeProPaywall(){proShowingPaywall=false;renderPro();}
 function getProStatus(){if(state.proOwned)return {key:"purchased",remainDays:0};var elapsedMs=Date.now()-(state.trialStartAt||Date.now());var remainDays=Math.ceil((28*86400000-elapsedMs)/86400000);if(remainDays<=0)return {key:"expired",remainDays:0};if(remainDays<=5)return {key:"trial-ending",remainDays:remainDays};return {key:"trial",remainDays:remainDays};}
 function proCanView(){var s=getProStatus().key;return s==="purchased"||s==="trial"||s==="trial-ending";}
+function renderProTrialPill(){
+  var pill=document.getElementById("pro-trial-pill");
+  if(!pill)return;
+  var ps=getProStatus();
+  if(ps.key==="purchased"){pill.style.display="none";return;}
+  pill.style.display="inline-block";
+  var d=ps.remainDays;
+  if(ps.key==="trial"){
+    // 一般試用期：灰底淡字、不點
+    pill.textContent="試用剩 "+d+" 天";
+    pill.style.background="rgba(0,0,0,0.04)";
+    pill.style.color="var(--ink-soft)";
+    pill.onclick=null;
+    pill.style.cursor="default";
+  }else if(ps.key==="trial-ending"){
+    // 倒數最後 5 天：琥珀色警示、可點解鎖
+    pill.textContent="試用剩 "+d+" 天 · 解鎖";
+    pill.style.background="#F4E5C5";
+    pill.style.color="#7A5500";
+    pill.onclick=function(){proShowingPaywall=true;renderPro();};
+    pill.style.cursor="pointer";
+  }else{
+    // expired：紅字、可點解鎖
+    pill.textContent="試用已結束 · 解鎖";
+    pill.style.background="#F9DCDC";
+    pill.style.color="#9A2828";
+    pill.onclick=function(){proShowingPaywall=true;renderPro();};
+    pill.style.cursor="pointer";
+  }
+}
 function renderPro(){
+  renderProTrialPill();
   var data=aggregateByParent();
   var total=0;for(var i=0;i<data.length;i++)total+=data[i].total;
   var ps=getProStatus();
@@ -1723,8 +1754,8 @@ function renderPro(){
       +'<circle cx="100" cy="100" r="70" fill="none" stroke="#F5C04A" stroke-width="22" stroke-dasharray="120 320" stroke-dashoffset="-180" transform="rotate(-90 100 100)"/>'
       +'<circle cx="100" cy="100" r="70" fill="none" stroke="#E89B5C" stroke-width="22" stroke-dasharray="80 360" stroke-dashoffset="-300" transform="rotate(-90 100 100)"/>'
       +'</svg><div class="mask">🔒</div></div>'
-      +'<h3>看細項花了什麼</h3>'
-      +'<p>每一筆都看得到<br/>知道錢去哪、之後好調整</p>'
+      +'<h3>解鎖看每一筆明細</h3>'
+      +'<p>點開任何分類、看到底花在哪<br/>每一筆金額、細項、日期都看得到</p>'
       +'<div class="price">NT$149<span class="v" style="font-size:13px;color:var(--ink-soft);margin-left:6px;">· 永久解鎖</span></div>'
       +'<button class="buy" onclick="buyPro()">永久解鎖 NT$149</button>'
       +'<button onclick="closeProPaywall()" style="display:block;margin:14px auto 0;background:transparent;color:var(--ink-soft);border:none;font-size:13px;cursor:pointer;font-family:inherit;text-decoration:underline;">← 返回看圓餅</button>'
@@ -1733,13 +1764,8 @@ function renderPro(){
     return;
   }
 
-  // 試用結束前 5 天 banner（付費者不顯示）
-  var banner="";
-  if(ps.key==="trial-ending"){
-    banner='<div style="background:#F4F1EC;color:var(--ink-soft);padding:10px 14px;border-radius:10px;margin:4px 0 14px;display:flex;align-items:center;gap:10px;font-size:13px;"><span>試用還剩 '+ps.remainDays+' 天</span><button onclick="buyPro()" style="margin-left:auto;background:var(--ink);color:#fff;border:none;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit;">永久解鎖</button></div>';
-  }
-
-  var html=banner+'<div class="pro-hd"><div class="tt">'+MONTH_NAMES[state.month-1]+'支出分布</div><div class="vv">$'+total.toLocaleString()+'</div></div>';
+  // 拿掉舊的 trial-ending banner（已被 pill 取代）
+  var html='<div class="pro-hd"><div class="tt">'+MONTH_NAMES[state.month-1]+'支出分布</div><div class="vv">$'+total.toLocaleString()+'</div></div>';
 
   if(data.length===0){
     html+='<div class="empty"><div class="e">○</div><div class="t">本月還沒有資料</div><div class="s">記幾筆之後再回來看</div></div>';
