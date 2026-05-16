@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
-<title>不月光 v1.10.5</title>
+<title>不月光 v1.11</title>
 <meta name="description" content="無痛記帳 · 水球視覺化你的本月預算"/>
 <meta name="theme-color" content="#1A2240"/>
 <meta name="application-name" content="不月光"/>
@@ -29,10 +29,10 @@
 html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Helvetica Neue",sans-serif;color:var(--ink);overflow:hidden;}
 .page{position:absolute;inset:0;display:flex;flex-direction:column;transition:opacity .28s, transform .28s;}
 .page.hide{opacity:0;pointer-events:none;transform:scale(0.97);}
-.topbar{padding:14px 18px 4px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
-.icon-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:18px;border-radius:50%;cursor:pointer;background:transparent;border:none;font-family:inherit;}
+.topbar{padding:calc(14px + env(safe-area-inset-top)) 18px 4px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+.icon-btn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:20px;border-radius:50%;cursor:pointer;background:transparent;border:none;font-family:inherit;}
 .icon-btn:active{background:var(--bg-2);}
-.peek-btn{background:rgba(255,255,255,0.7);border:0.5px solid var(--line);padding:7px 14px;border-radius:20px;display:flex;align-items:center;gap:8px;cursor:pointer;font-family:inherit;color:var(--ink);transition:all .15s;}
+.peek-btn{background:rgba(255,255,255,0.7);border:0.5px solid var(--line);padding:9px 14px;border-radius:20px;display:flex;align-items:center;gap:8px;cursor:pointer;font-family:inherit;color:var(--ink);transition:all .15s;}
 .peek-btn:active{background:#fff;transform:scale(0.97);}
 .peek-dot{width:10px;height:10px;border-radius:50%;background:#5BC0EB;transition:background .6s;}
 .peek-txt{font-size:13px;font-weight:500;}
@@ -47,7 +47,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 .nk{background:#fff;border:none;font-size:26px;font-weight:300;padding:18px;border-radius:14px;cursor:pointer;color:var(--ink);font-family:inherit;}
 .nk:active{background:#EFEAE0;}
 .nk.del{font-size:20px;color:var(--ink-soft);}
-.kpad-next{background:var(--ink);color:#fff;border:none;padding:18px;border-radius:18px;margin:0 16px 24px;font-size:16px;font-weight:500;cursor:pointer;font-family:inherit;}
+.kpad-next{background:var(--ink);color:#fff;border:none;padding:18px;border-radius:18px;margin:0 16px calc(24px + env(safe-area-inset-bottom));font-size:16px;font-weight:500;cursor:pointer;font-family:inherit;}
 .kpad-next:disabled{background:var(--ink-fade);cursor:not-allowed;}
 .kpad-extra{background:transparent;color:var(--ink-soft);border:1px dashed rgba(0,0,0,0.18);padding:11px;border-radius:14px;margin:8px 16px 0;font-size:13px;font-family:inherit;cursor:pointer;}
 .kpad-extra:active{background:rgba(0,0,0,0.04);}
@@ -107,16 +107,16 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 .copy{margin-top:12px;font-size:18px;font-weight:400;color:var(--ink);text-align:center;max-width:280px;line-height:1.4;}
 .daily{margin-top:8px;font-size:13px;color:var(--ink-soft);text-align:center;}
 .daily .v{color:var(--ink);font-weight:500;}
-.ball-cta{padding:0 16px 28px;}
+.ball-cta{padding:0 16px calc(28px + env(safe-area-inset-bottom));}
 .ball-cta button{width:100%;background:var(--ink);color:#fff;border:none;padding:17px;border-radius:18px;font-size:16px;font-weight:500;cursor:pointer;font-family:inherit;}
 .ball-cta button:active{opacity:0.85;}
-.welc-hint{padding:0 16px 28px;text-align:center;}
+.welc-hint{padding:0 16px calc(28px + env(safe-area-inset-bottom));text-align:center;}
 .welc-hint .t1{font-size:13px;color:var(--ink-soft);margin-bottom:14px;line-height:1.6;}
 .welc-hint button{background:var(--ink);color:#fff;border:none;padding:17px 40px;border-radius:28px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;min-width:200px;}
 .undo-bar{position:absolute;top:60px;left:50%;transform:translate(-50%,-150px);background:rgba(42,42,42,0.95);color:#fff;padding:10px 16px;border-radius:18px;font-size:13px;display:flex;align-items:center;gap:12px;transition:transform .35s cubic-bezier(.4,1.6,.5,1);z-index:30;white-space:nowrap;max-width:90%;}
 .undo-bar.show{transform:translate(-50%,0);}
 .undo-btn{background:none;border:none;color:#9FD4FF;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;}
-.xmonth{position:fixed;inset:0;background:var(--bg);z-index:95;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 30px;transition:opacity .4s, transform .4s;}
+.xmonth{position:fixed;inset:0;background:var(--bg);z-index:95;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:calc(40px + env(safe-area-inset-top)) 30px calc(40px + env(safe-area-inset-bottom));transition:opacity .4s, transform .4s;}
 .xmonth.hide{opacity:0;pointer-events:none;transform:scale(0.97);}
 .xmonth .label{font-size:11px;color:var(--ink-soft);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:30px;}
 .xmonth h1{font-size:28px;font-weight:400;text-align:center;line-height:1.4;margin-bottom:8px;}
@@ -131,7 +131,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 .xmonth button{background:var(--ink);color:#fff;border:none;padding:16px 56px;border-radius:28px;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;}
 .onb{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;flex-direction:column;transition:opacity .35s, transform .35s;height:100%;}
 .onb.hide{opacity:0;pointer-events:none;transform:scale(0.97);}
-.onb-top{height:46px;display:flex;align-items:center;padding:14px 24px 0;flex-shrink:0;}
+.onb-top{height:46px;display:flex;align-items:center;padding:calc(14px + env(safe-area-inset-top)) 24px 0;flex-shrink:0;}
 .onb-back{background:none;border:none;font-size:22px;color:var(--ink-soft);cursor:pointer;font-family:inherit;padding:0;}
 .onb-back.hide{visibility:hidden;}
 .onb-step{flex:1;display:flex;flex-direction:column;min-height:0;padding:0 24px;}
@@ -148,7 +148,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 .onb-nk.del{font-size:18px;color:var(--ink-soft);}
 .onb-quick{display:flex;gap:8px;margin:10px auto 0;flex-wrap:wrap;justify-content:center;}
 .onb-quick button{background:transparent;border:1px solid var(--ink-fade);color:var(--ink-soft);padding:6px 12px;border-radius:18px;font-size:12px;cursor:pointer;font-family:inherit;}
-.onb-footer{flex-shrink:0;padding:8px 24px 18px;background:var(--bg);}
+.onb-footer{flex-shrink:0;padding:8px 24px calc(18px + env(safe-area-inset-bottom));background:var(--bg);}
 .onb-actions{display:flex;gap:8px;align-items:center;justify-content:center;}
 .onb-btn{background:var(--ink);color:#fff;border:none;padding:13px 30px;border-radius:24px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;min-width:130px;}
 .onb-btn:disabled{background:var(--ink-fade);cursor:not-allowed;}
@@ -225,7 +225,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 .emoji-selected-preview{font-size:26px;text-align:center;line-height:1;margin-bottom:2px;}
 .sheet-ov{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:50;opacity:0;pointer-events:none;transition:opacity .25s;}
 .sheet-ov.show{opacity:1;pointer-events:auto;}
-.sheet{position:fixed;left:0;right:0;bottom:0;background:#F8F6F2;border-radius:24px 24px 0 0;padding:18px 18px 24px;transform:translateY(110%);transition:transform .3s cubic-bezier(.3,.9,.3,1);z-index:51;max-height:90%;display:flex;flex-direction:column;}
+.sheet{position:fixed;left:0;right:0;bottom:0;background:#F8F6F2;border-radius:24px 24px 0 0;padding:18px 18px calc(24px + env(safe-area-inset-bottom));transform:translateY(110%);transition:transform .3s cubic-bezier(.3,.9,.3,1);z-index:51;max-height:90%;display:flex;flex-direction:column;}
 .sheet.show{transform:translateY(0);}
 .sheet-grab{width:36px;height:4px;background:rgba(0,0,0,0.15);border-radius:2px;margin:0 auto 14px;flex-shrink:0;}
 .sheet-body{flex:1;overflow-y:auto;padding-bottom:12px;}
@@ -553,7 +553,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 <div class="sheet-ov" id="contact-ov" onclick="closeContact()"></div>
 <div class="sheet" id="contact-sheet"><div class="sheet-grab"></div><div class="sheet-hd"><button class="back" onclick="closeContact()">←</button><h2>聯絡我們</h2><button class="close" onclick="closeContact()">×</button></div><div class="sheet-body" id="contact-body"></div></div>
 <script>
-var APP_VERSION="1.10.5";
+var APP_VERSION="1.11.0";
 var MONTH_NAMES=["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"];
 var COPY={earlyMonth:["月初支出比較大，沒關係","固定費用剛繳完吧","先撐過月初這幾筆","等大筆過了水位會穩","房租、訂閱繳完了嗎"],calm:["步調很穩","節奏剛剛好","今天可以好好放鬆","這個月有餘裕","穩穩的"],healthy:["控制不錯","跟得上節奏","保持這個感覺","還在軌道上","節奏正常"],watch:["最近花得有點快","節奏稍微快了一些","這幾天的速度高了","可以放慢一下"],faster:["需要稍微踩個煞車","這週放慢一點會更好","節奏明顯快了","暫停一下大額消費"],alert:["這幾天放慢一點","讓自己喘口氣","暫時保守一點","等月底再規劃"],empty:["先讓自己喘口氣","下個月再開始新的節奏","停下來休息","本月先收手"],overspent:["這個月透支了","下個月重新開始就好","暫停一下，等月底重置","已經超出今天的份"],newMonth:["新的一個月開始","水位重新滿了","新節奏，慢慢來"]};
 var COLORS={calm:"#4FB3D9",healthy:"#5BC0EB",watch:"#F5C04A",faster:"#E89B5C",alert:"#E5675A",empty:"#D4A4A0",earlyMonth:"#7FB8D4",newMonth:"#5BC0EB",overspent:"#B86A5C"};
@@ -715,10 +715,10 @@ function lerpColor(a,b,t){var ah=parseInt(a.slice(1),16),bh=parseInt(b.slice(1),
 function buildWavePath(level,phase,amp){var baseY=240*(1-level);var d="M0,"+(baseY+Math.sin(phase)*amp);for(var x=0;x<=240;x+=6){var y=baseY+Math.sin((x/40)+phase)*amp;d+=" L"+x+","+y;}d+=" L240,240 L0,240 Z";return d;}
 function ratioToCapHeight(ratio,r){ratio=Math.max(0,Math.min(1,ratio));if(ratio===0)return 0;if(ratio===1)return 2*r;var target=2*Math.PI*ratio;var lo=0,hi=2*Math.PI;for(var i=0;i<40;i++){var mid=(lo+hi)/2;if(mid-Math.sin(mid)<target)lo=mid;else hi=mid;}return r*(1-Math.cos(lo/2));}
 var welcomeLevel=1.0;
-function tick(){waveT+=0.04;currentLevel+=(targetLevel-currentLevel)*0.06;currentColor=lerpColor(currentColor,targetColor,0.05);var p1=document.getElementById("wave-path");var p2=document.getElementById("wave-path-2");if(p1){p1.setAttribute("d",buildWavePath(currentLevel,waveT,4));p1.setAttribute("fill",currentColor);}if(p2){p2.setAttribute("d",buildWavePath(currentLevel-0.015,waveT*0.7+1.5,5));p2.setAttribute("fill",currentColor);}
+function tick(){waveT+=0.045;currentLevel+=(targetLevel-currentLevel)*0.030;currentColor=lerpColor(currentColor,targetColor,0.05);var p1=document.getElementById("wave-path");var p2=document.getElementById("wave-path-2");if(p1){p1.setAttribute("d",buildWavePath(currentLevel,waveT,8));p1.setAttribute("fill",currentColor);}if(p2){p2.setAttribute("d",buildWavePath(currentLevel-0.015,waveT*0.7+1.5,10));p2.setAttribute("fill",currentColor);}
 var fl=document.getElementById("fixed-layer");if(fl){var fh=currentFixedRatio>0?ratioToCapHeight(currentFixedRatio,115)+5:0;fl.setAttribute("y","0");fl.setAttribute("height",String(fh));var fe=document.getElementById("fixed-edge");if(fe){fe.setAttribute("y1",String(fh));fe.setAttribute("y2",String(fh));fe.setAttribute("opacity",fh>8?"1":"0");}}
 var sl=document.getElementById("savings-layer");if(sl){var sh=currentSavingsRatio>0?ratioToCapHeight(currentSavingsRatio,115)+5:0;sl.setAttribute("y",String(240-sh));sl.setAttribute("height",String(sh));var se=document.getElementById("savings-edge");if(se){se.setAttribute("y1",String(240-sh));se.setAttribute("y2",String(240-sh));se.setAttribute("opacity",sh>8?"1":"0");}}
-var w1=document.getElementById("w-wave-1");var w2=document.getElementById("w-wave-2");if(w1){w1.setAttribute("d",buildWavePath(welcomeLevel,waveT,4));}if(w2){w2.setAttribute("d",buildWavePath(welcomeLevel-0.015,waveT*0.7+1.5,5));}var xm=document.getElementById("xm-wave");if(xm){xm.setAttribute("d",buildWavePath(xmLevel,waveT,4));}requestAnimationFrame(tick);}
+var w1=document.getElementById("w-wave-1");var w2=document.getElementById("w-wave-2");if(w1){w1.setAttribute("d",buildWavePath(welcomeLevel,waveT,8));}if(w2){w2.setAttribute("d",buildWavePath(welcomeLevel-0.015,waveT*0.7+1.5,10));}var xm=document.getElementById("xm-wave");if(xm){xm.setAttribute("d",buildWavePath(xmLevel,waveT,8));}requestAnimationFrame(tick);}
 function updateMonthLabel(){var ml=document.getElementById("ball-month");if(ml)ml.textContent=state.year+" · "+MONTH_NAMES[state.month-1];}
 function render(){var st=getStateInfo();var pct=Math.round(st.R*100);targetLevel=Math.max(0.04,Math.min(1,st.R));
   var pn=document.getElementById("pct-num");if(pn){if(pct<0){pn.className="pct neg";pn.innerHTML=pct+'<span class="sym">%</span>';}else{pn.className="pct";pn.innerHTML=pct+'<span class="sym">%</span>';}}
