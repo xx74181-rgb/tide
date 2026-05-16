@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"/>
-<title>不月光—無痛記帳 v1.10</title>
+<title>不月光 v1.10.3</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23EBE6DD'/%3E%3Cclippath id='c'%3E%3Ccircle cx='50' cy='50' r='48'/%3E%3C/clippath%3E%3Cpath d='M0 60 L100 55 L100 100 L0 100 Z' fill='%235BC0EB' clip-path='url(%23c)'/%3E%3C/svg%3E"/>
 <style>
 :root{--bg:#F4F1EC;--bg-2:#EBE6DD;--ink:#2A2A2A;--ink-soft:#7A7670;--ink-fade:#B5AFA6;--line:rgba(0,0,0,.07);--danger:#C84A3A;}
@@ -402,7 +402,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 <div class="ball-cta" style="display:flex;flex-direction:column;gap:10px;"><button onclick="gotoKpad()">＋ 再記一筆</button><button onclick="openHist()" style="background:transparent;color:var(--ink-soft);border:1.5px solid rgba(0,0,0,0.12);font-size:15px;">看本月明細</button></div>
 </div>
 <div class="page ball-page hide" id="pg-welcome">
-<div class="topbar"><div style="width:36px;"></div><div style="text-align:center;line-height:1.3;"><div style="font-size:14px;color:var(--ink);font-weight:500;letter-spacing:0.02em;">不月光—無痛記帳</div><div style="font-size:10px;color:var(--ink-fade);letter-spacing:0.1em;margin-top:2px;">歡迎</div></div><div style="width:36px;"></div></div>
+<div class="topbar"><div style="width:36px;"></div><div style="text-align:center;line-height:1.3;"><div style="font-size:14px;color:var(--ink);font-weight:500;letter-spacing:0.02em;">不月光</div><div style="font-size:10px;color:var(--ink-fade);letter-spacing:0.1em;margin-top:2px;">歡迎</div></div><div style="width:36px;"></div></div>
 <div class="hero">
 <div class="welc-callout" id="welc-callout" style="display:none;flex-direction:column;align-items:center;gap:4px;margin-bottom:-4px;color:var(--ink-soft);font-size:12px;position:relative;z-index:2;">
 <div style="display:flex;align-items:center;gap:6px;">
@@ -528,8 +528,14 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 <div class="sheet" id="histlist-sheet"><div class="sheet-grab"></div><div class="sheet-hd"><h2>過去月份</h2><button class="close" onclick="closeHistList()">×</button></div><div class="sheet-body" id="histlist-body"></div></div>
 <div class="sheet-ov" id="monthdetail-ov" onclick="closeMonthDetail()"></div>
 <div class="sheet" id="monthdetail-sheet"><div class="sheet-grab"></div><div class="sheet-hd"><button class="back" onclick="closeMonthDetail()">←</button><h2 id="monthdetail-title">月份明細</h2><button class="close" onclick="closeMonthDetail()">×</button></div><div class="sheet-body" id="monthdetail-body"></div></div>
+
+<div class="sheet-ov" id="privacy-ov" onclick="closePrivacy()"></div>
+<div class="sheet" id="privacy-sheet"><div class="sheet-grab"></div><div class="sheet-hd"><button class="back" onclick="closePrivacy()">←</button><h2>隱私權政策</h2><button class="close" onclick="closePrivacy()">×</button></div><div class="sheet-body" id="privacy-body"></div></div>
+
+<div class="sheet-ov" id="contact-ov" onclick="closeContact()"></div>
+<div class="sheet" id="contact-sheet"><div class="sheet-grab"></div><div class="sheet-hd"><button class="back" onclick="closeContact()">←</button><h2>聯絡我們</h2><button class="close" onclick="closeContact()">×</button></div><div class="sheet-body" id="contact-body"></div></div>
 <script>
-var APP_VERSION="1.10";
+var APP_VERSION="1.10.3";
 var MONTH_NAMES=["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"];
 var COPY={earlyMonth:["月初支出比較大，沒關係","固定費用剛繳完吧","先撐過月初這幾筆","等大筆過了水位會穩","房租、訂閱繳完了嗎"],calm:["步調很穩","節奏剛剛好","今天可以好好放鬆","這個月有餘裕","穩穩的"],healthy:["控制不錯","跟得上節奏","保持這個感覺","還在軌道上","節奏正常"],watch:["最近花得有點快","節奏稍微快了一些","這幾天的速度高了","可以放慢一下"],faster:["需要稍微踩個煞車","這週放慢一點會更好","節奏明顯快了","暫停一下大額消費"],alert:["這幾天放慢一點","讓自己喘口氣","暫時保守一點","等月底再規劃"],empty:["先讓自己喘口氣","下個月再開始新的節奏","停下來休息","本月先收手"],overspent:["這個月透支了","下個月重新開始就好","暫停一下，等月底重置","已經超出今天的份"],newMonth:["新的一個月開始","水位重新滿了","新節奏，慢慢來"]};
 var COLORS={calm:"#4FB3D9",healthy:"#5BC0EB",watch:"#F5C04A",faster:"#E89B5C",alert:"#E5675A",empty:"#D4A4A0",earlyMonth:"#7FB8D4",newMonth:"#5BC0EB",overspent:"#B86A5C"};
@@ -546,9 +552,44 @@ var DEFAULT_CATS=[
 {e:"✨",l:"其他",subs:[{e:"📦",l:"雜費"},{e:"⚠",l:"罰款"},{e:"💳",l:"手續費"}]}
 ];
 var TEMPLATES=[
-{group:"娛樂訂閱",groupKey:"entertainment",items:[{key:"spotify",icon:"🎵",name:"Spotify",amt:149,preset:true},{key:"netflix",icon:"🎬",name:"Netflix",amt:460},{key:"youtube",icon:"📺",name:"YouTube Premium",amt:199},{key:"disney",icon:"🏰",name:"Disney+",amt:320},{key:"psplus",icon:"🎮",name:"PS Plus",amt:198},{key:"applemusic",icon:"🎶",name:"Apple Music",amt:165}]},
-{group:"生活月費",groupKey:"life",items:[{key:"phone",icon:"📱",name:"手機費",amt:599,preset:true,day:25},{key:"gym",icon:"🏋",name:"健身房",amt:1280},{key:"internet",icon:"🌐",name:"網路費",amt:999},{key:"insurance",icon:"🛡",name:"保險",amt:2500},{key:"rent",icon:"🏠",name:"房租",amt:12000,day:5}]},
-{group:"工作訂閱",groupKey:"work",items:[{key:"chatgpt",icon:"💬",name:"ChatGPT Plus",amt:670},{key:"claude",icon:"🤖",name:"Claude Pro",amt:670},{key:"canva",icon:"🎨",name:"Canva Pro",amt:300},{key:"notion",icon:"📝",name:"Notion Plus",amt:300},{key:"figma",icon:"🎯",name:"Figma Professional",amt:450},{key:"adobe",icon:"🖼",name:"Adobe CC",amt:1050}]}
+{group:"生活月費",groupKey:"life",items:[
+  {key:"rent",icon:"🏠",name:"房租",amt:15000,day:5},
+  {key:"utilities",icon:"💡",name:"水電瓦斯",amt:2500,day:10},
+  {key:"phone",icon:"📱",name:"手機費",amt:599,preset:true,day:25},
+  {key:"insurance",icon:"🛡",name:"保險",amt:1700,day:1},
+  {key:"icloud",icon:"☁️",name:"iCloud+ / Google One",amt:90,day:1},
+  {key:"internet",icon:"🌐",name:"固網網路費",amt:999,day:5},
+  {key:"hoa",icon:"🏢",name:"管理費",amt:1500,day:1},
+  {key:"foodpanda",icon:"🛵",name:"Uber One / foodpanda Pro",amt:120,day:1},
+  {key:"supplement",icon:"💊",name:"健康投資（保健食品）",amt:1200,day:1},
+  {key:"gym",icon:"🏋",name:"健身房",amt:1280,day:1},
+  {key:"tpass",icon:"🚇",name:"台北捷運 TPASS 月票",amt:1200,day:1},
+  {key:"parking",icon:"🅿️",name:"停車費",amt:3000,day:1},
+  {key:"gogoro",icon:"🛵",name:"Gogoro 月租 / 基本油資",amt:499,day:1}
+]},
+{group:"工作訂閱",groupKey:"work",items:[
+  {key:"microsoft365",icon:"📊",name:"Microsoft 365 個人版",amt:219},
+  {key:"chatgpt",icon:"💬",name:"ChatGPT Plus",amt:670},
+  {key:"canva",icon:"🎨",name:"Canva Pro",amt:300},
+  {key:"notion",icon:"📝",name:"Notion Plus",amt:300},
+  {key:"perplexity",icon:"🔍",name:"Perplexity Pro",amt:650},
+  {key:"claude",icon:"🤖",name:"Claude Pro",amt:650},
+  {key:"figma",icon:"🎯",name:"Figma Professional",amt:480},
+  {key:"cursor",icon:"💻",name:"Cursor Pro",amt:650},
+  {key:"midjourney",icon:"🖼",name:"Midjourney Standard",amt:950},
+  {key:"adobe",icon:"🎬",name:"Adobe CC",amt:1050}
+]},
+{group:"娛樂訂閱",groupKey:"entertainment",items:[
+  {key:"youtube",icon:"📺",name:"YouTube Premium",amt:199},
+  {key:"netflix",icon:"🎬",name:"Netflix 高級方案",amt:390},
+  {key:"spotify",icon:"🎵",name:"Spotify Premium",amt:149,preset:true},
+  {key:"applemusic",icon:"🎶",name:"Apple Music",amt:165},
+  {key:"disney",icon:"🏰",name:"Disney+ 高級方案",amt:320},
+  {key:"kkbox",icon:"🎧",name:"KKBOX",amt:149},
+  {key:"bahamut",icon:"🎌",name:"巴哈姆特動畫瘋",amt:99},
+  {key:"psplus",icon:"🎮",name:"PS Plus Essential",amt:198},
+  {key:"switch",icon:"🕹",name:"Nintendo Switch Online",amt:80}
+]}
 ];
 var SAVINGS_TEMPLATES=[
 {key:"stock_etf",icon:"📊",name:"股票 ETF",amt:3000,day:5},
@@ -776,7 +817,7 @@ function removeIncome(id){
 function buildExportPayload(){
   // 完整的 state snapshot + metadata
   return {
-    _app: "不月光—無痛記帳 (Tide)",
+    _app: "不月光 (Tide)",
     _exportVersion: APP_VERSION,
     _exportedAt: new Date().toISOString(),
     state: deepCopy(state)
@@ -1187,6 +1228,10 @@ if(_lbMs){
 html+='<div class="row link" onclick="openExport()"><span class="ico">⬇</span><div class="nm">匯出資料<div class="sub">'+_lbText+'</div></div><span class="arr">›</span></div>';
 html+='<div class="row link" onclick="openImport()"><span class="ico">⬆</span><div class="nm">匯入資料<div class="sub">從備份檔還原（會覆蓋目前資料）</div></div><span class="arr">›</span></div>';
 html+='<div class="row danger link" onclick="clearMonth()"><div class="nm">清空本月明細</div></div>';
+html+='<div class="set-sec">關於</div>';
+html+='<div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:6px;font-size:12px;color:var(--ink-soft);line-height:1.7;">不月光完全在你的裝置本機運作，記帳資料不會上傳到任何伺服器。匯出檔內含完整記帳記錄，請妥善保管。</div>';
+html+='<div class="row link" onclick="openPrivacy()"><span class="ico">🛡</span><div class="nm">隱私權政策<div class="sub">資料如何被使用</div></div><span class="arr">›</span></div>';
+html+='<div class="row link" onclick="openContact()"><span class="ico">✉</span><div class="nm">聯絡我們<div class="sub">回報問題、建議或刪除資料請求</div></div><span class="arr">›</span></div>';
 /* === PROTOTYPE DEBUG: 試用/買斷 狀態快速跳期, 上線前移除整段 === */
 html+='<div style="margin-top:24px;padding:12px;background:#FFF4E0;border:1px dashed #D89B3A;border-radius:10px;font-size:12px;">';
 html+='<div style="color:#8A6520;font-weight:500;margin-bottom:8px;">⚙ 測試用 · Pro 狀態跳期</div>';
@@ -1198,7 +1243,7 @@ html+='<button onclick="debugSetTrialDays(0)" style="flex:1;min-width:60px;paddi
 html+='<button onclick="debugSetTrialDays(&quot;owned&quot;)" style="flex:1;min-width:60px;padding:7px;font-size:11px;border:1px solid #D89B3A;background:#fff;border-radius:6px;cursor:pointer;font-family:inherit;">已永久<br/>解鎖</button>';
 html+='</div></div>';
 /* === END PROTOTYPE DEBUG === */
-html+='<div style="text-align:center;padding:20px 0 4px;font-size:10px;color:var(--ink-fade);letter-spacing:0.05em;line-height:1.6;">不月光—無痛記帳<br/>Tide · v'+APP_VERSION+'</div>';
+html+='<div style="text-align:center;padding:20px 0 4px;font-size:10px;color:var(--ink-fade);letter-spacing:0.05em;line-height:1.6;">不月光<br/>Tide · v'+APP_VERSION+'</div>';
 document.getElementById("set-body").innerHTML=html;
 if(fxEditingId){setTimeout(function(){var inp=document.getElementById("fx-amt-"+fxEditingId);if(inp){inp.focus();inp.select();}},80);}}
 function setBudget(v){var n=parseInt(v);if(isNaN(n)||n<=0)return;if(n>9999999)n=9999999;state.budget=n;persist();render();}
@@ -1227,6 +1272,84 @@ var openedMonthIdx=-1, monthDrillIdx=-1;
 function openMonthDetail(idx){openedMonthIdx=idx;monthDrillIdx=-1;renderMonthDetail();document.getElementById("monthdetail-sheet").classList.add("show");document.getElementById("monthdetail-ov").classList.add("show");}
 function closeMonthDetail(){document.getElementById("monthdetail-sheet").classList.remove("show");document.getElementById("monthdetail-ov").classList.remove("show");openedMonthIdx=-1;monthDrillIdx=-1;}
 function toggleMonthDrill(i){monthDrillIdx=(monthDrillIdx===i)?-1:i;renderMonthDetail();}
+
+/* === 隱私權政策 + 聯絡 === */
+function openPrivacy(){renderPrivacy();document.getElementById("privacy-sheet").classList.add("show");document.getElementById("privacy-ov").classList.add("show");}
+function closePrivacy(){document.getElementById("privacy-sheet").classList.remove("show");document.getElementById("privacy-ov").classList.remove("show");}
+function openContact(){renderContact();document.getElementById("contact-sheet").classList.add("show");document.getElementById("contact-ov").classList.add("show");}
+function closeContact(){document.getElementById("contact-sheet").classList.remove("show");document.getElementById("contact-ov").classList.remove("show");}
+function renderPrivacy(){
+  var html='';
+  html+='<div style="font-size:12px;color:var(--ink-fade);margin-bottom:18px;">最近更新：2026 年 05 月 16 日</div>';
+  html+='<div style="font-size:13px;color:var(--ink-soft);line-height:1.8;margin-bottom:18px;">歡迎使用由不月光團隊（以下簡稱「我們」）開發的應用程式（以下簡稱「本應用程式」）。我們非常重視使用者的隱私權，並承諾保護您的個人資料。本隱私權政策旨在說明我們如何收集、使用、披露及保護您的資訊，並符合 Apple App Store（iOS）與 Google Play（Android）的最新上架審查規範。</div>';
+  html+='<div style="font-size:12px;color:var(--ink);background:#F4F1EC;padding:10px 12px;border-radius:10px;margin-bottom:20px;line-height:1.7;">請您在使用本應用程式前，仔細閱讀本隱私權政策。若您開始使用本應用程式，即代表您已同意本政策之內容。</div>';
+
+  html+=privSec("一、我們收集的資訊","為了提供穩定的服務、優化使用者體驗並進行市場概念驗證，我們可能會收集以下兩類資訊：",
+    [
+      {b:"您主動提供的資訊",t:"當您透過電子郵件與我們聯絡、提交意見回饋或填寫新功能預約敲碗表單時，我們會收集您的電子郵件地址（Email）以及您主動提供的訊息內容。"},
+      {b:"自動收集的匿名資訊",t:"裝置型號、作業系統版本、瀏覽器類型；應用程式內活動數據（點擊、勾選、功能使用頻率、錯誤回報 Log）。所有自動收集的數據均為去識別化（Anonymous）的統計資料，無法用以追蹤或識別您的真實身份。"}
+    ]);
+  html+=privSec("二、資訊的使用方式","我們所收集的資訊將嚴格用於以下用途，絕不挪作他用：",
+    [
+      {b:"維持與優化服務",t:"分析去識別化的匿名數據，用以修正程式錯誤並改善 UI/UX 體驗。"},
+      {b:"市場驗證",t:"評估使用者對核心財務配置功能的喜好程度，作為未來持續開發與更新的依據。"},
+      {b:"溝通與聯繫",t:"僅在您主動留下 Email 時，用於發送與本應用程式相關的更新通知或市場調查問卷。"}
+    ]);
+  html+=privSec("三、資訊的披露與第三方服務","我們絕對不會將您的個人資料出售、出租、交換、或披露給任何無關的第三方公司或個人。",
+    [{t:"為了優化流量與統計分析，本應用程式未來若整合第三方分析工具（例如 Google Analytics for Firebase 等），該等第三方服務提供商將依據其自身的隱私權政策處理數據。建議您參閱各該服務提供商的官方隱私權協議。"}]);
+  html+=privSec("四、資料保留與安全性","",
+    [
+      {b:"在地儲存",t:"本應用程式使用您裝置的本地儲存空間（如 iOS UserDefaults、Android SharedPreferences 或網頁 LocalStorage）來保存您的預算與記帳紀錄。這類資料完全保留在您的個人裝置上，我們不會同步至外部伺服器。您可隨時透過清除應用程式資料或瀏覽器快取將其完全刪除。"},
+      {b:"安全防護",t:"我們採取合理的技術與組織措施來保護您主動提供的 Email 等資訊，防止未經授權的存取、修改或洩漏。"}
+    ]);
+  html+=privSec("五、行動平台特殊規範聲明","",
+    [
+      {b:"Apple iOS 規範",t:"我們嚴格遵守 Apple 的 App 追蹤透明度（ATT）架構。本應用程式不包含任何跨網站或跨 App 的第三方廣告追蹤行為。"},
+      {b:"Google Android 規範",t:"我們嚴格遵守 Google Play 的開發者政策。本應用程式不主動索取與核心功能無關的敏感權限（精確地理位置、通訊錄、相簿、相機等）。"}
+    ]);
+  html+=privSec("六、您的權利","依據適用之法律，您對於我們所持有的個人資料擁有以下權利：",
+    [
+      {t:"查詢、閱覽或要求複製本"},
+      {t:"要求補充或更正"},
+      {t:"要求停止搜集、處理、利用，或請求完全刪除您的個人聯絡資料"}
+    ]);
+  html+='<div style="font-size:12px;color:var(--ink-soft);background:#F4F1EC;padding:10px 12px;border-radius:10px;margin-bottom:20px;line-height:1.7;">如要行使上述權利，請透過下方「聯絡我們」與不月光團隊聯繫。</div>';
+
+  html+=privSec("七、政策修訂","我們可能會不定期更新本隱私權政策，以反映服務的變更或法律規範的調整。任何修訂均會更新「最近更新日期」，建議您定期查閱。",[]);
+
+  html+='<div style="margin-top:24px;padding:14px;background:#fff;border-radius:12px;font-size:13px;line-height:1.8;">';
+  html+='<div style="font-weight:500;color:var(--ink);margin-bottom:8px;">八、聯絡我們</div>';
+  html+='<div style="color:var(--ink-soft);">開發團隊：不月光</div>';
+  html+='<div style="color:var(--ink-soft);">電子郵件：<a href="mailto:xx74181@gmail.com" style="color:#5BC0EB;text-decoration:none;">xx74181@gmail.com</a></div>';
+  html+='</div>';
+  html+='<div style="height:40px;"></div>';
+  document.getElementById("privacy-body").innerHTML=html;
+}
+function privSec(title,intro,bullets){
+  var h='<div style="margin-bottom:22px;">';
+  h+='<div style="font-size:14px;font-weight:500;color:var(--ink);margin-bottom:8px;">'+title+'</div>';
+  if(intro)h+='<div style="font-size:13px;color:var(--ink-soft);line-height:1.8;margin-bottom:10px;">'+intro+'</div>';
+  if(bullets&&bullets.length){
+    for(var i=0;i<bullets.length;i++){var b=bullets[i];
+      h+='<div style="font-size:13px;color:var(--ink-soft);line-height:1.8;margin-bottom:8px;padding-left:14px;position:relative;">';
+      h+='<span style="position:absolute;left:0;top:0;color:var(--ink-fade);">·</span>';
+      if(b.b)h+='<b style="color:var(--ink);">'+b.b+'：</b>';
+      h+=b.t+'</div>';
+    }
+  }
+  h+='</div>';return h;
+}
+function renderContact(){
+  var html='';
+  html+='<div style="font-size:13px;color:var(--ink-soft);line-height:1.8;margin-bottom:20px;">回報問題、提出建議、申請刪除個人資料、或想跟我們聊聊，都可以透過下面信箱聯絡我們。</div>';
+  html+='<div style="background:#fff;border-radius:12px;padding:18px;margin-bottom:16px;">';
+  html+='<div style="font-size:11px;color:var(--ink-fade);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">EMAIL</div>';
+  html+='<a href="mailto:xx74181@gmail.com" style="font-size:16px;color:var(--ink);text-decoration:none;font-weight:500;">xx74181@gmail.com</a>';
+  html+='</div>';
+  html+='<div style="font-size:12px;color:var(--ink-fade);line-height:1.7;padding:0 4px;">我們會盡力在 5 個工作天內回覆。報問題時若能附上：1. 操作步驟 2. 你看到的畫面 3. 期望結果，會更快幫到你。</div>';
+  html+='<div style="height:60px;"></div>';
+  document.getElementById("contact-body").innerHTML=html;
+}
 
 function aggregateTxsByParent(txs){
   // Section: "savings"（每月儲蓄 + 單筆儲蓄）, "fixed"（依 TEMPLATES 順序）, "manual"（依金額排）
