@@ -1,0 +1,11 @@
+# 本機備份檔
+*.bak
+*.backup
+*~
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/

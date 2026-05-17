@@ -459,7 +459,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 </div>
 <div class="welc-hint"><div class="t1" id="w-hint">點下方開始記帳，水位會慢慢流動</div><button onclick="finishWelcome()">開始</button></div>
 </div>
-<div class="undo-bar" id="undo-bar"><span class="ub-txt" id="undo-txt">已扣 $0 · 餐飲</span><button class="undo-btn" onclick="doUndo()">撤銷</button></div>
+<div class="undo-bar" id="undo-bar"><span class="ub-txt" id="undo-txt">已扣 $0 · 餐飲</span><button class="undo-btn" onclick="tideHaptic('success');doUndo()">撤銷</button></div>
 </div>
 <div class="sheet-ov" id="sa-ov" onclick="closeSubAdd()"></div>
 <div class="sub-add-form" id="sa-form"><div class="ft"><span class="ic" id="sa-cat-ic"></span>在 <span id="sa-cat-name"></span> 新增細項</div><div class="fr"><label>名稱</label><input id="sa-name" type="text" placeholder="例如：宵夜"/></div><div class="emoji-picker-label">選個圖示</div><div class="emoji-grid" id="sa-emoji-grid"></div><div class="acts"><button class="cancel" onclick="closeSubAdd()">取消</button><button class="save" onclick="saveSubAdd()">新增並選擇</button></div></div>
@@ -473,7 +473,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
   </div>
   <div class="acts">
     <button class="cancel" onclick="commitNote(false)">跳過</button>
-    <button class="save" onclick="commitNote(true)">確認</button>
+    <button class="save" onclick="tideHaptic('success');commitNote(true)">確認</button>
   </div>
 </div>
 <div class="sheet-ov" id="income-ov"></div>
@@ -485,7 +485,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
   <div class="fr"><label>來源</label><input id="inc-note" type="text" placeholder="選填，例如：接案 A 公司"/></div>
   <div class="acts">
     <button class="cancel" onclick="closeIncomeForm()">取消</button>
-    <button class="save" onclick="saveIncome()">加入</button>
+    <button class="save" onclick="tideHaptic('success');saveIncome()">加入</button>
   </div>
 </div>
 
@@ -499,7 +499,7 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
   <div class="fr"><label>備注</label><input id="edittx-note" type="text" placeholder="選填"/></div>
   <div class="acts">
     <button class="cancel" onclick="closeEditTx()">取消</button>
-    <button class="save" onclick="saveEditTx()">儲存</button>
+    <button class="save" onclick="tideHaptic('success');saveEditTx()">儲存</button>
   </div>
 </div>
 <div class="sheet-ov" id="set-ov" onclick="closeSet()"></div>
@@ -553,6 +553,36 @@ html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSys
 <div class="sheet-ov" id="contact-ov" onclick="closeContact()"></div>
 <div class="sheet" id="contact-sheet"><div class="sheet-grab"></div><div class="sheet-hd"><button class="back" onclick="closeContact()">←</button><h2>聯絡我們</h2><button class="close" onclick="closeContact()">×</button></div><div class="sheet-body" id="contact-body"></div></div>
 <script>
+
+// === Capacitor 原生整合(iOS App 才生效、Android / PWA 不影響)===
+(function(){
+  var Cap = window.Capacitor;
+  if (!Cap || !Cap.isNativePlatform || !Cap.isNativePlatform()) {
+    window.tideHaptic = function(){};
+    return;
+  }
+  try {
+    var Haptics = Cap.Plugins && Cap.Plugins.Haptics;
+    var StatusBar = Cap.Plugins && Cap.Plugins.StatusBar;
+    window.tideHaptic = function(style){
+      if (!Haptics) return;
+      try {
+        if (style === 'success') Haptics.notification({ type: 'SUCCESS' });
+        else if (style === 'heavy') Haptics.impact({ style: 'HEAVY' });
+        else if (style === 'medium') Haptics.impact({ style: 'MEDIUM' });
+        else Haptics.impact({ style: 'LIGHT' });
+      } catch(e){}
+    };
+    if (StatusBar) {
+      try { StatusBar.setStyle({ style: 'DARK' }); } catch(e){}
+      try { StatusBar.setOverlaysWebView({ overlay: false }); } catch(e){}
+    }
+  } catch(e){
+    window.tideHaptic = function(){};
+  }
+})();
+// === Capacitor 整合結束 ===
+
 var APP_VERSION="1.11.0";
 var MONTH_NAMES=["一月","二月","三月","四月","五月","六月","七月","八月","九月","十月","十一月","十二月"];
 var COPY={earlyMonth:["月初支出比較大，沒關係","固定費用剛繳完吧","先撐過月初這幾筆","等大筆過了水位會穩","房租、訂閱繳完了嗎"],calm:["步調很穩","節奏剛剛好","今天可以好好放鬆","這個月有餘裕","穩穩的"],healthy:["控制不錯","跟得上節奏","保持這個感覺","還在軌道上","節奏正常"],watch:["最近花得有點快","節奏稍微快了一些","這幾天的速度高了","可以放慢一下"],faster:["需要稍微踩個煞車","這週放慢一點會更好","節奏明顯快了","暫停一下大額消費"],alert:["這幾天放慢一點","讓自己喘口氣","暫時保守一點","等月底再規劃"],empty:["先讓自己喘口氣","下個月再開始新的節奏","停下來休息","本月先收手"],overspent:["這個月透支了","下個月重新開始就好","暫停一下，等月底重置","已經超出今天的份"],newMonth:["新的一個月開始","水位重新滿了","新節奏，慢慢來"]};
